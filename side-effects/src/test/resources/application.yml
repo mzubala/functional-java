@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    password: test
+    username: test
+  sql:
+    init:
+      mode: always
