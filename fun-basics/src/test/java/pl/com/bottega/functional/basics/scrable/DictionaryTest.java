@@ -1,4 +1,4 @@
-package pl.com.bottega.functional.basics;
+package pl.com.bottega.functional.basics.scrable;
 
 import org.junit.jupiter.api.Test;
 
