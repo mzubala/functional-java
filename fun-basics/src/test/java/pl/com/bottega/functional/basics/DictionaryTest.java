@@ -17,5 +17,7 @@ public class DictionaryTest {
         assertThat(dictionary.findPossibleWords(List.of('t', 'i', 's', 'o', 'k', 'm')))
             .containsExactly("sitom", "sito", "kot", "sit");
         assertThat(dictionary.findPossibleWords(List.of('r', 'a', 'z'))).isEmpty();
+        assertThat(dictionary.findPossibleWords(List.of('*', 'a', 'k', 't', 'm', 's', '*')))
+            .containsExactly("miasto", "sitom", "sito", "ala", "kot", "lal", "sit");
     }
 }
