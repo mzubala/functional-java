@@ -1,12 +1,13 @@
 package pl.com.bottega.functional.basics;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 class DictionaryLoader {
 
@@ -17,29 +18,19 @@ class DictionaryLoader {
     }
 
     Collection<String> load() {
-        try (var reader = getReader()) {
-            String line;
-            var words = new HashSet<String>();
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                var lineWords = line.split(", ");
-                for (int i = 0; i < lineWords.length; i++) {
-                    lineWords[i] = lineWords[i].trim();
-                }
-                for(String word : lineWords) {
-                    if(isUsable(word)) {
-                        words.add(word);
-                    }
-                }
-            }
-            return words;
-        } catch (Exception ex) {
+        try (var lines = getLines()) {
+            return lines.flatMap(this::wordsInLine).collect(Collectors.toSet());
+        } catch (IOException ex) {
             throw new RuntimeException("Failed to read the dictionary.");
         }
     }
 
-    private BufferedReader getReader() throws FileNotFoundException {
-        return new BufferedReader(new FileReader(new File(path)));
+    private Stream<String> wordsInLine(String line) {
+        return Arrays.stream(line.split(", ")).map(String::trim).filter(this::isUsable);
+    }
+
+    private Stream<String> getLines() throws IOException {
+        return Files.lines(Path.of(path));
     }
 
     private boolean isUsable(String word) {
