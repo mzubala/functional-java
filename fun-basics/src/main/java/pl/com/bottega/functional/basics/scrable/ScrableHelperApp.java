@@ -1,4 +1,4 @@
-package pl.com.bottega.functional.basics;
+package pl.com.bottega.functional.basics.scrable;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
