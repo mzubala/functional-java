@@ -4,15 +4,15 @@ import lombok.Builder;
 import lombok.Value;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 class EmployeesFinder {
     private final Collection<Employee> employees = new HashSet<>();
@@ -22,123 +22,94 @@ class EmployeesFinder {
     }
 
     Optional<Employee> findById(String id) {
-        for (Employee employee : employees) {
-            if (employee.getId().equals(id)) {
-                return Optional.of(employee);
-            }
-        }
-        return Optional.empty();
+        return employees.stream()
+            .filter(employee -> employee.getId().equals(id))
+            .findFirst();
     }
 
     Employee getById(String id) throws NoSuchElementException {
-        var employeeOptional = findById(id);
-        if (employeeOptional.isPresent()) {
-            return employeeOptional.get();
-        }
-        throw new NoSuchElementException();
+        return findById(id).orElseThrow(NoSuchElementException::new);
     }
 
     Collection<Employee> findBy(EmployeeQuery query) {
-        var results = new LinkedList<Employee>();
-        for (Employee employee : employees) {
-            if (query.matches(employee)) {
-                results.add(employee);
-            }
-        }
-        return results;
+        return employeesMatching(query)
+            .collect(Collectors.toList());
+    }
+
+    private Stream<Employee> employeesMatching(EmployeeQuery query) {
+        return employees.stream()
+            .filter(query::matches);
     }
 
     Collection<BasicEmployeeData> findBasicEmployeeDataBy(EmployeeQuery query) {
-        var results = new LinkedList<BasicEmployeeData>();
-        for (Employee employee : employees) {
-            if (query.matches(employee)) {
-                results.add(new BasicEmployeeData(employee));
-            }
-        }
-        return results;
+        return employeesMatching(query)
+            .map(BasicEmployeeData::new)
+            .collect(Collectors.toList());
     }
 
     Optional<Double> avgSalary() {
-        if (employees.isEmpty()) {
-            return Optional.empty();
-        }
-        var avg = 0.0;
-        int count = 0;
-        for (var employee : employees) {
-            avg = (avg * count + employee.getYearlySalary()) / ++count;
-        }
-        return Optional.of(avg);
+        return employees.stream()
+            .mapToDouble(Employee::getYearlySalary)
+            .average()
+            .stream()
+            .boxed()
+            .findFirst();
     }
 
     Optional<String> mostCommonFirstName() {
-        var namesCounts = new HashMap<String, Integer>();
-        for (var employee : employees) {
-            var currentCount = namesCounts.getOrDefault(employee.getFirstName(), 0);
-            namesCounts.put(employee.getFirstName(), currentCount + 1);
-        }
-        var namesList = new LinkedList<>(namesCounts.entrySet());
-        namesList.sort(new Comparator<Map.Entry<String, Integer>>() {
-            @Override
-            public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
-                return o2.getValue().compareTo(o1.getValue());
-            }
-        });
-        if (namesList.size() == 0) {
-            return Optional.empty();
-        } else {
-            return Optional.of(namesList.get(0).getKey());
-        }
+        return employees.stream()
+            .collect(Collectors.groupingBy(Employee::getFirstName, Collectors.counting()))
+            .entrySet().stream()
+            .max(Map.Entry.comparingByValue())
+            .map(Map.Entry::getKey);
     }
 
     Optional<Integer> highestSalary() {
-        if (employees.isEmpty()) {
-            return Optional.empty();
-        }
-        var highest = Integer.MIN_VALUE;
-        for (var employee : employees) {
-            if (employee.getYearlySalary() > highest) {
-                highest = employee.getYearlySalary();
-            }
-        }
-        return Optional.of(highest);
+        return employees.stream()
+            .mapToInt(Employee::getYearlySalary)
+            .max().stream().boxed().findFirst();
     }
 
     Map<Department, Integer> lowestSalariesPerDepartment() {
-        var salaries = new HashMap<Department, Integer>();
-        for (var employee : employees) {
-            for (var department : employee.getDepartments()) {
-                var minSalary = salaries.getOrDefault(department, Integer.MAX_VALUE);
-                if (employee.getYearlySalary() < minSalary) {
-                    salaries.put(department, employee.getYearlySalary());
-                }
-            }
-        }
-        return salaries;
+        return employees.stream().collect(
+            HashMap::new,
+            this::mergeEmployeeSalariesToMinSalariesMap,
+            this::mergeMinSalaryMaps
+        );
+    }
+
+    private void mergeEmployeeSalariesToMinSalariesMap(Map<Department, Integer> acc, Employee employee) {
+        employee.getDepartments().forEach(department -> acc.merge(department, employee.getYearlySalary(), Math::min));
+    }
+
+    private void mergeMinSalaryMaps(Map<Department, Integer> m1, Map<Department, Integer> m2) {
+        m2.forEach((key, value) -> m1.merge(key, value, Math::min));
     }
 
     Set<Department> departmentsOfEmployeesMatching(EmployeeQuery query) {
-        var results = new HashSet<Department>();
-        for (Employee employee : employees) {
-            if (query.matches(employee)) {
-                results.addAll(employee.getDepartments());
-            }
-        }
-        return results;
+        return employeesMatching(query).flatMap(employee -> employee.getDepartments().stream()).collect(Collectors.toSet());
     }
 
     Collection<EmployeesInDepartment> employeesInDepartments() {
-        Map<Department, EmployeesInDepartment> map = new HashMap<>();
-        for (var employee : employees) {
-            for (var department : employee.getDepartments()) {
-                var employeesInDepartment = map.get(department);
-                if (employeesInDepartment == null) {
-                    employeesInDepartment = new EmployeesInDepartment(department);
-                    map.put(department, employeesInDepartment);
-                }
-                employeesInDepartment.add(employee);
-            }
-        }
-        return map.values();
+        return employees.stream().collect(HashMap::new, this::addEmployee, this::mergeEmployeesInDepartmentsMaps).values();
+    }
+
+    private void addEmployee(Map<Department, EmployeesInDepartment> employeesInDepartmentMap, Employee employee) {
+        employee.getDepartments().forEach(department -> {
+            employeesInDepartmentMap.putIfAbsent(department, new EmployeesInDepartment(department));
+            employeesInDepartmentMap.computeIfPresent(department, (dep, employeesInDepartment) -> employeesInDepartment.add(employee));
+        });
+    }
+
+    private void mergeEmployeesInDepartmentsMaps(Map<Department, EmployeesInDepartment> first, Map<Department, EmployeesInDepartment> second) {
+        second.forEach(((department, employeesInDepartment) -> {
+            first.merge(department, employeesInDepartment, this::mergeEmployeesInDepartments);
+        }));
+    }
+
+    private EmployeesInDepartment mergeEmployeesInDepartments(EmployeesInDepartment firstEmployeesInDepartment, EmployeesInDepartment secondEmployeesInDepartment) {
+        secondEmployeesInDepartment.employees.forEach(firstEmployeesInDepartment::add);
+        return firstEmployeesInDepartment;
     }
 
     @Value
@@ -166,13 +137,7 @@ class EmployeesFinder {
         }
 
         private boolean containsAny(Set<Department> departments, Set<Department> toCheck) {
-            for (Department department : toCheck) {
-                if (departments.contains(department)) {
-                    return true;
-                }
-            }
-            return false;
-
+            return toCheck.stream().anyMatch(departments::contains);
         }
     }
 
