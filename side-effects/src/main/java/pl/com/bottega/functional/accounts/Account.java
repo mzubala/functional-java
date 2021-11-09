@@ -10,7 +10,7 @@ class Account {
     private final CustomerId customerId;
     private final AccountNumber accountNumber;
 
-    private final Money balance;
+    private Money balance;
 
     private final Long version;
 
@@ -31,11 +31,17 @@ class Account {
                 return Try.failure(new InsufficientFundsException());
             }
             return balance.subtract(amount);
-        }).map(newBalance -> new Account(customerId, accountNumber, newBalance, version));
+        }).map(newBalance -> {
+            this.balance = newBalance;
+            return null;
+        });
     }
 
     public Try<Account> credit(Money amount) {
-        return balance.add(amount).map((newBalance) -> new Account(customerId, accountNumber, newBalance, version));
+        return balance.add(amount).map((newBalance) -> {
+            this.balance = newBalance;
+            return null;
+        });
     }
 
     public AccountNumber getNumber() {
