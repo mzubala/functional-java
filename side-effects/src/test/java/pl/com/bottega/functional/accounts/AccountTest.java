@@ -45,11 +45,12 @@ public class AccountTest {
         var account = anAccount().withBalance(FIVE_USD).build();
 
         // when
-        account.credit(TEN_USD);
-        account.credit(FIVE_USD);
+        var creditedAccount = account.credit(TEN_USD)
+            .flatMap((afterFirstCredit) -> afterFirstCredit.credit(FIVE_USD));
 
         // then
-        assertThat(account.getBalance()).isEqualTo(new Money(new BigDecimal("20"), USD));
+        assertThat(account.getBalance()).isEqualTo(FIVE_USD);
+        assertThat(creditedAccount.get().getBalance()).isEqualTo(new Money(new BigDecimal("20"), USD));
     }
 
     @Test
@@ -67,11 +68,11 @@ public class AccountTest {
         var account = anAccount().withBalance(TEN_USD).build();
 
         // when
-        account.debit(FIVE_USD);
-        account.debit(FIVE_USD);
+        var debitedAccount = account.debit(FIVE_USD).flatMap((afterFirstDebit) -> afterFirstDebit.debit(FIVE_USD));
 
         // then
-        assertThat(account.getBalance()).isEqualTo(Money.zero(USD));
+        assertThat(account.getBalance()).isEqualTo(TEN_USD);
+        assertThat(debitedAccount.get().getBalance()).isEqualTo(Money.zero(USD));
     }
 
     @Test
