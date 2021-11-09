@@ -26,22 +26,11 @@ class Account {
     }
 
     public Try<?> debit(Money amount) {
-        return balance.isLessThan(amount).flatMap((insufficientFunds) -> {
-            if(insufficientFunds) {
-                return Try.failure(new InsufficientFundsException());
-            }
-            return balance.subtract(amount);
-        }).map(newBalance -> {
-            this.balance = newBalance;
-            return null;
-        });
+        return null;
     }
 
     public Try<?> credit(Money amount) {
-        return balance.add(amount).map((newBalance) -> {
-            this.balance = newBalance;
-            return null;
-        });
+        return null;
     }
 
     public AccountNumber getNumber() {
