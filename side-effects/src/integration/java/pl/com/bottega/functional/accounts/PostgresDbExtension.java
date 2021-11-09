@@ -30,18 +30,19 @@ public class PostgresDbExtension implements BeforeAllCallback, BeforeEachCallbac
 
     private void cleanDB(ExtensionContext extensionContext) throws SQLException {
         var context = SpringExtension.getApplicationContext(extensionContext);
-        var connection = context.getBean(JdbcTemplate.class).getDataSource().getConnection();
-        DatabaseMetaData metaData = connection.getMetaData();
-        ResultSet tables = metaData.getTables(null, null, null, new String[]{"TABLE"});
-        List<String> tablesToTruncate = new ArrayList<>();
-        while (tables.next()) {
-            String tableName = tables.getString("TABLE_NAME");
-            tablesToTruncate.add(tableName);
+        try (var connection = context.getBean(JdbcTemplate.class).getDataSource().getConnection()) {
+            DatabaseMetaData metaData = connection.getMetaData();
+            ResultSet tables = metaData.getTables(null, null, null, new String[]{"TABLE"});
+            List<String> tablesToTruncate = new ArrayList<>();
+            while (tables.next()) {
+                String tableName = tables.getString("TABLE_NAME");
+                tablesToTruncate.add(tableName);
+            }
+            if (tablesToTruncate.size() == 0) {
+                return;
+            }
+            connection.prepareStatement("TRUNCATE " + tablesToTruncate.stream().collect(Collectors.joining(","))).executeUpdate();
         }
-        if(tablesToTruncate.size() == 0) {
-            return;
-        }
-        connection.prepareStatement("TRUNCATE " + tablesToTruncate.stream().collect(Collectors.joining(","))).executeUpdate();
     }
 
     @Override

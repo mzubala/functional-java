@@ -1,5 +1,6 @@
 package pl.com.bottega.functional.accounts;
 
+import io.vavr.control.Try;
 import lombok.NonNull;
 import lombok.Value;
 
@@ -7,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.Currency;
 
 @Value
-class Money implements Comparable<Money> {
+class Money {
 
     @NonNull
     BigDecimal value;
@@ -19,42 +20,51 @@ class Money implements Comparable<Money> {
         return new Money(BigDecimal.ZERO, currency);
     }
 
-    Money add(Money other) {
-        ensureSameCurrencies(other);
+    Try<Money> add(Money other) {
+        return ensureSameCurrencies(other).map(this::safeAdd);
+    }
+
+    private Money safeAdd(Money other) {
         return new Money(value.add(other.value), currency);
     }
 
-    Money subtract(Money other) {
-        ensureSameCurrencies(other);
+    Try<Money> subtract(Money other) {
+        return ensureSameCurrencies(other).map(this::safeSubtract);
+    }
+
+    private Money safeSubtract(Money other) {
         return new Money(value.subtract(other.value), currency);
     }
 
-    boolean isGreaterThan(Money other) {
-        return compareTo(other) > 0;
+    Try<Boolean> isGreaterThan(Money other) {
+        return compareTo(other).map((result) -> result > 0);
     }
 
-    boolean isLessThan(Money other) {
-        return compareTo(other) < 0;
+    Try<Boolean> isLessThan(Money other) {
+        return compareTo(other).map((result) -> result < 0);
     }
 
-    boolean isGreaterThanOrEqualTo(Money other) {
-        return compareTo(other) >= 0;
+    Try<Boolean> isGreaterThanOrEqualTo(Money other) {
+        return compareTo(other).map((result) -> result >= 0);
     }
 
-    boolean isLessThanOrEqualTo(Money other) {
-        return compareTo(other) <= 0;
+    Try<Boolean> isLessThanOrEqualTo(Money other) {
+        return compareTo(other).map((result) -> result <= 0);
     }
 
-    @Override
-    public int compareTo(Money other) {
-        ensureSameCurrencies(other);
+    private Try<Integer> compareTo(Money other) {
+        return ensureSameCurrencies(other).map(this::safeCompareTo);
+    }
+
+    private int safeCompareTo(Money other) {
         return value.compareTo(other.value);
     }
 
-    private void ensureSameCurrencies(Money other) {
-        if(!other.currency.equals(currency)) {
-            throw new IncompatibleCurrenciesException();
+    private Try<Money> ensureSameCurrencies(Money other) {
+        if (!other.currency.equals(currency)) {
+            return Try.failure(new IncompatibleCurrenciesException());
         }
+        return Try.success(other);
     }
 }
 

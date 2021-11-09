@@ -33,8 +33,8 @@ class DefaultTransferFundsHandler implements TransferFundsHandler {
     public void handle(TransferCommand command) {
         final var sourceAccount = accountRepository.find(command.getSource());
         final var targetAccount = accountRepository.find(command.getDestination());
-        sourceAccount.debit(command.getAmount());
-        targetAccount.credit(command.getAmount());
+        sourceAccount.debit(command.getAmount()).get();
+        targetAccount.credit(command.getAmount()).get();
         accountRepository.save(sourceAccount);
         accountRepository.save(targetAccount);
     }
