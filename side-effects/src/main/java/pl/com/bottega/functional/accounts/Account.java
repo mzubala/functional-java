@@ -1,5 +1,6 @@
 package pl.com.bottega.functional.accounts;
 
+import io.vavr.control.Try;
 import lombok.NonNull;
 import lombok.Value;
 
@@ -24,15 +25,23 @@ class Account {
         this.version = version;
     }
 
-    public void debit(Money amount) {
-        if (balance.isLessThan(amount)) {
-            throw new InsufficientFundsException();
-        }
-        balance = balance.subtract(amount);
+    public Try<?> debit(Money amount) {
+        return balance.isLessThan(amount).flatMap((insufficientFunds) -> {
+            if(insufficientFunds) {
+                return Try.failure(new InsufficientFundsException());
+            }
+            return balance.subtract(amount);
+        }).map(newBalance -> {
+            this.balance = newBalance;
+            return null;
+        });
     }
 
-    public void credit(Money amount) {
-        balance = balance.add(amount);
+    public Try<?> credit(Money amount) {
+        return balance.add(amount).map((newBalance) -> {
+            this.balance = newBalance;
+            return null;
+        });
     }
 
     public AccountNumber getNumber() {

@@ -1,11 +1,11 @@
 package pl.com.bottega.functional.accounts;
 
+import org.assertj.vavr.api.VavrAssertions;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static pl.com.bottega.functional.accounts.ExampleTestData.FIRST_ACCOUNT_NUMBER;
 import static pl.com.bottega.functional.accounts.ExampleTestData.FIRST_CUSTOMER_ID;
 import static pl.com.bottega.functional.accounts.ExampleTestData.FIVE_USD;
@@ -58,7 +58,7 @@ public class AccountTest {
         var account = anAccount().withBalance(FIVE_USD).build();
 
         // expect
-        assertThatThrownBy(() -> account.credit(TEN_EUR)).isInstanceOf(IncompatibleCurrenciesException.class);
+        VavrAssertions.assertThat(account.credit(TEN_EUR)).failBecauseOf(IncompatibleCurrenciesException.class);
     }
 
     @Test
@@ -80,7 +80,7 @@ public class AccountTest {
         var account = anAccount().withBalance(TEN_EUR).build();
 
         // expect
-        assertThatThrownBy(() -> account.debit(FIVE_USD)).isInstanceOf(IncompatibleCurrenciesException.class);
+        VavrAssertions.assertThat(account.debit(FIVE_USD)).failBecauseOf(IncompatibleCurrenciesException.class);
     }
 
     @Test
@@ -89,6 +89,6 @@ public class AccountTest {
         var account = anAccount().withBalance(FIVE_USD).build();
 
         // expect
-        assertThatThrownBy(() -> account.debit(TEN_USD)).isInstanceOf(InsufficientFundsException.class);
+        VavrAssertions.assertThat(account.debit(TEN_USD)).failBecauseOf(InsufficientFundsException.class);
     }
 }
