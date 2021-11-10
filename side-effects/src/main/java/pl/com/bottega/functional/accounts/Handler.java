@@ -1,6 +1,7 @@
 package pl.com.bottega.functional.accounts;
 
 import lombok.AllArgsConstructor;
+import reactor.core.publisher.Mono;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -11,7 +12,7 @@ import java.util.stream.Stream;
 import static pl.com.bottega.functional.accounts.Handler.Command;
 
 interface Handler<CommandType extends Command> {
-    void handle(CommandType command);
+    Mono<Void> handle(CommandType command);
 
     default Optional<Type> supportedCommandType() {
         return getGenericInterfaces(getClass())

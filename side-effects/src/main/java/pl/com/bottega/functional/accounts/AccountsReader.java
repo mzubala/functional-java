@@ -4,15 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.com.bottega.functional.accounts.AccountRepository.NoSuchAccountException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 interface AccountsReader {
 
-    List<AccountDto> getAccountsOf(CustomerId customerId);
+    Flux<AccountDto> getAccountsOf(CustomerId customerId);
 
-    AccountDto getAccount(AccountNumber accountNumber) throws NoSuchAccountException;
+    Mono<AccountDto> getAccount(AccountNumber accountNumber) throws NoSuchAccountException;
 
     @Data
     @AllArgsConstructor

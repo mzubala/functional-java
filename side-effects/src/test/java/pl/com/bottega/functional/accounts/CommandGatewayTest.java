@@ -1,6 +1,7 @@
 package pl.com.bottega.functional.accounts;
 
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Mono;
 
 import static org.assertj.core.util.Lists.list;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,7 +50,10 @@ class CommandGatewayTest {
     @Test
     public void forbidsAnonymousHandlers() {
         // given
-        Handler<ExampleHandlers.FirstCommand> anonymousHandler = command -> System.out.println("");
+        Handler<ExampleHandlers.FirstCommand> anonymousHandler = command -> Mono.fromCallable(() -> {
+            System.out.println("");
+            return null;
+        });
 
         // expect
         assertThrows(IllegalArgumentException.class, () -> new CommandGateway(list(anonymousHandler)));

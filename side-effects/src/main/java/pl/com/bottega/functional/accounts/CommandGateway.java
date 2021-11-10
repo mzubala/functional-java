@@ -2,6 +2,7 @@ package pl.com.bottega.functional.accounts;
 
 import org.springframework.stereotype.Component;
 import pl.com.bottega.functional.accounts.Handler.Command;
+import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -32,12 +33,12 @@ class CommandGateway {
         );
     }
 
-    void execute(Command command) {
+    Mono<Void> execute(Command command) {
         Class<? extends Command> commandClass = command.getClass();
         Handler handler = handlersMap.get(commandClass.getTypeName());
         if(handler == null) {
             throw new IllegalArgumentException("No handler found for " + command.getClass().getName());
         }
-        handler.handle(command);
+        return handler.handle(command);
     }
 }

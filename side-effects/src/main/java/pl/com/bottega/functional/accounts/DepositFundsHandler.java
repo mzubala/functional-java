@@ -2,11 +2,12 @@ package pl.com.bottega.functional.accounts;
 
 import lombok.AllArgsConstructor;
 import lombok.Value;
+import reactor.core.publisher.Mono;
 
 import static pl.com.bottega.functional.accounts.DepositFundsHandler.DepositFundsCommand;
 
 interface DepositFundsHandler extends Handler<DepositFundsCommand> {
-    void handle(DepositFundsCommand command);
+    Mono<Void> handle(DepositFundsCommand command);
 
     @Value
     class DepositFundsCommand implements Command {
@@ -21,8 +22,9 @@ class DefaultDepositFundsHandler implements DepositFundsHandler {
     private final AccountRepository accountRepository;
 
     @Override
-    public void handle(DepositFundsCommand command) {
-        var account = accountRepository.find(command.getDestination());
-        account.credit(command.getAmount()).andThen(accountRepository::save).get();
+    public Mono<Void> handle(DepositFundsCommand command) {
+        return accountRepository.find(command.getDestination())
+            .map((account) -> account.credit(command.getAmount()).get())
+            .flatMap(accountRepository::save);
     }
 }

@@ -3,6 +3,7 @@ package pl.com.bottega.functional.accounts;
 import org.junit.jupiter.api.Test;
 import pl.com.bottega.functional.accounts.ExampleHandlers.FirstCommand;
 import pl.com.bottega.functional.accounts.ExampleHandlers.FirstCommandHandler;
+import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Type;
 
@@ -14,8 +15,8 @@ public class HandlerTest {
         // given
         var handler = new Handler<>() {
             @Override
-            public void handle(Command command) {
-
+            public Mono<Void> handle(Command command) {
+                return Mono.empty();
             }
         };
 
@@ -26,7 +27,10 @@ public class HandlerTest {
     @Test
     public void returnsNoSupportedCommandTypeForLambdaDefinedHandler() {
         // given
-        Handler<FirstCommand> anonymousHandler = command -> System.out.println("");
+        Handler<FirstCommand> anonymousHandler = command -> Mono.fromCallable(() -> {
+            System.out.println("");
+            return null;
+        });
 
         // expect
         assertThat(anonymousHandler.supportedCommandType()).isEmpty();

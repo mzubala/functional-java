@@ -3,6 +3,8 @@ package pl.com.bottega.functional.accounts;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import pl.com.bottega.functional.accounts.AccountRepository.NoSuchAccountException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,15 +16,15 @@ class AccountsReaderAdapter implements AccountsReader {
     private final SpringDataAccountRepository repository;
 
     @Override
-    public List<AccountDto> getAccountsOf(CustomerId customerId) {
-        return repository.findByCustomerId(customerId.getValue()).map(this::toDto).collect(Collectors.toList());
+    public Flux<AccountDto> getAccountsOf(CustomerId customerId) {
+        return repository.findByCustomerId(customerId.getValue()).map(this::toDto);
     }
 
     @Override
-    public AccountDto getAccount(AccountNumber accountNumber) throws NoSuchAccountException {
+    public Mono<AccountDto> getAccount(AccountNumber accountNumber) {
         return repository.findByNumber(accountNumber.getValue())
             .map(this::toDto)
-            .orElseThrow(NoSuchAccountException::new);
+            .switchIfEmpty(Mono.error(NoSuchAccountException::new));
     }
 
     private AccountDto toDto(AccountEntity accountEntity) {

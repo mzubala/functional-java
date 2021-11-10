@@ -1,19 +1,23 @@
 package pl.com.bottega.functional.accounts;
 
-import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.r2dbc.connection.R2dbcTransactionManager;
+import org.springframework.transaction.reactive.TransactionalOperator;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import pl.com.bottega.functional.accounts.Handler.Command;
+import reactor.core.publisher.Mono;
 
 class TransactionalHandler<CommandType extends Command> extends HandlerDecorator<CommandType> {
 
-    private final TransactionTemplate transactionTemplate;
+    private final TransactionalOperator transactionalOperator;
 
-    public TransactionalHandler(TransactionTemplate transactionTemplate, Handler<CommandType> handler) {
+    public TransactionalHandler(TransactionalOperator transactionalOperator, Handler<CommandType> handler) {
         super(handler);
-        this.transactionTemplate = transactionTemplate;
+        this.transactionalOperator = transactionalOperator;
     }
 
     @Override
-    public void handle(CommandType command) {
-        transactionTemplate.executeWithoutResult((status) -> decorated.handle(command));
+    public Mono<Void> handle(CommandType command) {
+        return //transactionalOperator.execute(status -> decorated.handle(command)).then();
+            decorated.handle(command);
     }
 }

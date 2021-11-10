@@ -32,8 +32,8 @@ class E2ETests {
 
     @BeforeEach
     void setup() {
-        customerRepository.save(FIRST_CUSTOMER);
-        customerRepository.save(SECOND_CUSTOMER);
+        customerRepository.save(FIRST_CUSTOMER).block();
+        customerRepository.save(SECOND_CUSTOMER).block();
     }
 
     @Test

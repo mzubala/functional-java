@@ -2,12 +2,12 @@ package pl.com.bottega.functional.accounts;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import pl.com.bottega.functional.accounts.DepositFundsHandler.DepositFundsCommand;
 import pl.com.bottega.functional.accounts.TransferFundsHandler.TransferCommand;
 import pl.com.bottega.functional.accounts.WithdrawFundsHandler.WithdrawFundsCommand;
 
-import static pl.com.bottega.functional.accounts.OpenAccountHandler.*;
+import static pl.com.bottega.functional.accounts.OpenAccountHandler.OpenAccountCommand;
 
 @Configuration
 class AppConfiguration {
@@ -15,10 +15,10 @@ class AppConfiguration {
     @Bean
     Handler<TransferCommand> transferFundsHandler(
             AccountRepository accountRepository,
-            TransactionTemplate transactionTemplate
+            TransactionalOperator transactionOperator
     ) {
         return new TransactionalHandler(
-                transactionTemplate,
+                transactionOperator,
                 new DefaultTransferFundsHandler(accountRepository)
         );
     }
@@ -26,10 +26,10 @@ class AppConfiguration {
     @Bean
     Handler<WithdrawFundsCommand> withdrawFundsCommandHandler(
             AccountRepository accountRepository,
-            TransactionTemplate transactionTemplate
+            TransactionalOperator transactionOperator
     ) {
         return new TransactionalHandler<>(
-                transactionTemplate,
+                transactionOperator,
                 new DefaultWithdrawFundsHandler(accountRepository)
         );
     }
@@ -37,10 +37,10 @@ class AppConfiguration {
     @Bean
     Handler<DepositFundsCommand> depositFundsCommandHandler(
             AccountRepository accountRepository,
-            TransactionTemplate transactionTemplate
+            TransactionalOperator transactionOperator
     ) {
         return new TransactionalHandler<>(
-                transactionTemplate,
+                transactionOperator,
                 new DefaultDepositFundsHandler(accountRepository)
         );
     }
@@ -50,10 +50,10 @@ class AppConfiguration {
             CustomerRepository customerRepository,
             AccountRepository accountRepository,
             AccountNumberGenerator accountNumberGenerator,
-            TransactionTemplate transactionTemplate
+            TransactionalOperator transactionOperator
     ) {
         return new TransactionalHandler<>(
-                transactionTemplate,
+                transactionOperator,
                 new DefaultOpenAccountHandler(customerRepository, accountNumberGenerator, accountRepository)
         );
     }

@@ -21,6 +21,8 @@ import pl.com.bottega.functional.accounts.DepositFundsHandler.DepositFundsComman
 import pl.com.bottega.functional.accounts.OpenAccountHandler.OpenAccountCommand;
 import pl.com.bottega.functional.accounts.TransferFundsHandler.TransferCommand;
 import pl.com.bottega.functional.accounts.WithdrawFundsHandler.WithdrawFundsCommand;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -41,32 +43,32 @@ class AccountsController {
     private final AccountsReader accountsReader;
 
     @PostMapping
-    public void open(@Valid @RequestBody OpenAccountRequest request) {
-        commandGateway.execute(request.toCommand());
+    public Mono<Void> open(@Valid @RequestBody OpenAccountRequest request) {
+        return commandGateway.execute(request.toCommand());
     }
 
     @PostMapping("/{accountNumber}/deposit")
-    public void deposit(@PathVariable String accountNumber, @Valid @RequestBody DepositFundsRequest request) {
-        commandGateway.execute(request.toCommand(accountNumber));
+    public Mono<Void> deposit(@PathVariable String accountNumber, @Valid @RequestBody DepositFundsRequest request) {
+        return commandGateway.execute(request.toCommand(accountNumber));
     }
 
     @PostMapping("/{accountNumber}/withdrawal")
-    public void withdraw(@PathVariable String accountNumber, @Valid @RequestBody WithdrawFundsRequest withdrawFundsRequest) {
-        commandGateway.execute(withdrawFundsRequest.toCommand(accountNumber));
+    public Mono<Void> withdraw(@PathVariable String accountNumber, @Valid @RequestBody WithdrawFundsRequest withdrawFundsRequest) {
+        return commandGateway.execute(withdrawFundsRequest.toCommand(accountNumber));
     }
 
     @PostMapping("/transfer")
-    public void transfer(@RequestBody TransferFundsRequest request) {
-        commandGateway.execute(request.toCommand());
+    public Mono<Void> transfer(@RequestBody TransferFundsRequest request) {
+        return commandGateway.execute(request.toCommand());
     }
 
     @GetMapping("/{number}")
-    public AccountDto getAccount(@PathVariable String number) {
+    public Mono<AccountDto> getAccount(@PathVariable String number) {
         return accountsReader.getAccount(new AccountNumber(number));
     }
 
     @GetMapping
-    public List<AccountDto> getAccountsOf(@RequestParam String customerId) {
+    public Flux<AccountDto> getAccountsOf(@RequestParam String customerId) {
         return accountsReader.getAccountsOf(new CustomerId(UUID.fromString(customerId)));
     }
 

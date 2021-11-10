@@ -1,5 +1,7 @@
 package pl.com.bottega.functional.accounts;
 
+import reactor.core.publisher.Mono;
+
 class ExampleHandlers {
     interface IFirstCommandHandler extends Handler<FirstCommand> {
 
@@ -8,7 +10,8 @@ class ExampleHandlers {
     static class FirstCommandHandlerComplex implements IFirstCommandHandler {
 
         @Override
-        public void handle(FirstCommand command) {
+        public Mono<Void> handle(FirstCommand command) {
+            return Mono.empty();
         }
     }
 
@@ -25,8 +28,9 @@ class ExampleHandlers {
         FirstCommand handledCommand;
 
         @Override
-        public void handle(FirstCommand command) {
+        public Mono<Void> handle(FirstCommand command) {
             this.handledCommand = command;
+            return Mono.empty();
         }
     }
 
@@ -35,8 +39,9 @@ class ExampleHandlers {
         SecondCommand handledCommand;
 
         @Override
-        public void handle(SecondCommand command) {
+        public Mono<Void> handle(SecondCommand command) {
             this.handledCommand = command;
+            return Mono.empty();
         }
     }
 
@@ -47,8 +52,8 @@ class ExampleHandlers {
         }
 
         @Override
-        public void handle(CommandType command) {
-            decorated.handle(command);
+        public Mono<Void> handle(CommandType command) {
+            return decorated.handle(command);
         }
     }
 }
