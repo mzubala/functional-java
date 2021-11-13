@@ -58,9 +58,9 @@ class WithdrawFundsTest {
     @Test
     void respondsWithUnprocessableEntityWhenThereIsNotEnoughFunds() {
         // given
-        customerRepository.save(FIRST_CUSTOMER);
+        customerRepository.save(FIRST_CUSTOMER).block();
         var account = anAccount().withCustomerId(FIRST_CUSTOMER.getId()).withBalance(Money.zero(EUR)).withVersion(null).build();
-        accountRepository.save(account);
+        accountRepository.save(account).block();
 
 
         // expect
@@ -72,10 +72,10 @@ class WithdrawFundsTest {
     @Test
     void respondsWithUnprocessableEntityWhenWithdrawalIsMadeInAnotherCurrency() {
         // given
-        customerRepository.save(FIRST_CUSTOMER);
+        customerRepository.save(FIRST_CUSTOMER).block();
         var account = anAccount().withCustomerId(FIRST_CUSTOMER.getId())
             .withBalance(ExampleTestData.TEN_USD).withVersion(null).build();
-        accountRepository.save(account);
+        accountRepository.save(account).block();
 
 
         // expect

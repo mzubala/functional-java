@@ -22,7 +22,8 @@ class DefaultWithdrawFundsHandler implements WithdrawFundsHandler {
 
     @Override
     public void handle(WithdrawFundsCommand command) {
-        var account = accountRepository.find(command.getDestination());
-        account.debit(command.getAmount()).andThen(accountRepository::save).get();
+        accountRepository.find(command.getDestination())
+            .map(account -> account.debit(command.getAmount()).get())
+            .flatMap(accountRepository::save).block();
     }
 }

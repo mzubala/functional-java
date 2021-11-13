@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import pl.com.bottega.functional.accounts.AccountRepository.NoSuchAccountException;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,14 +16,13 @@ class AccountsReaderAdapter implements AccountsReader {
 
     @Override
     public List<AccountDto> getAccountsOf(CustomerId customerId) {
-        return repository.findByCustomerId(customerId.getValue()).map(this::toDto).collect(Collectors.toList());
+        return repository.findByCustomerId(customerId.getValue()).map(this::toDto).toStream().collect(Collectors.toList());
     }
 
     @Override
     public AccountDto getAccount(AccountNumber accountNumber) throws NoSuchAccountException {
         return repository.findByNumber(accountNumber.getValue())
-            .map(this::toDto)
-            .orElseThrow(NoSuchAccountException::new);
+            .map(this::toDto).block();
     }
 
     private AccountDto toDto(AccountEntity accountEntity) {

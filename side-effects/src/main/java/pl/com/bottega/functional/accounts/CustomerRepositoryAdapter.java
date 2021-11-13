@@ -9,8 +9,8 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.data.repository.Repository;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -20,20 +20,21 @@ public class CustomerRepositoryAdapter implements CustomerRepository {
     private final SpringDataCustomerRepository repository;
 
     @Override
-    public Customer find(CustomerId customerId) throws CustomerNotFoundException {
-        return repository.findById(customerId.getValue()).orElseThrow(CustomerNotFoundException::new).toDomain();
+    public Mono<Customer> find(CustomerId customerId) throws CustomerNotFoundException {
+        return repository.findById(customerId.getValue()).switchIfEmpty(Mono.error(CustomerNotFoundException::new))
+            .map(CustomerEntity::toDomain);
     }
 
     @Override
-    public void save(Customer customer) {
-        repository.save(CustomerEntity.of(customer));
+    public Mono<Void> save(Customer customer) {
+        return repository.save(CustomerEntity.of(customer)).then();
     }
 }
 
 interface SpringDataCustomerRepository extends Repository<CustomerEntity, UUID> {
-    void save(CustomerEntity customerEntity);
+    Mono<CustomerEntity> save(CustomerEntity customerEntity);
 
-    Optional<CustomerEntity> findById(UUID id);
+    Mono<CustomerEntity> findById(UUID id);
 }
 
 @Data

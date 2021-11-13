@@ -22,7 +22,8 @@ class DefaultDepositFundsHandler implements DepositFundsHandler {
 
     @Override
     public void handle(DepositFundsCommand command) {
-        var account = accountRepository.find(command.getDestination());
-        account.credit(command.getAmount()).andThen(accountRepository::save).get();
+        accountRepository.find(command.getDestination())
+            .map((account) -> account.credit(command.getAmount()).get())
+            .flatMap(accountRepository::save).block();
     }
 }

@@ -2,6 +2,7 @@ package pl.com.bottega.functional.accounts;
 
 import lombok.AllArgsConstructor;
 import lombok.Value;
+import reactor.core.publisher.Mono;
 
 import java.util.Currency;
 
@@ -27,10 +28,12 @@ class DefaultOpenAccountHandler implements OpenAccountHandler {
 
     @Override
     public void handle(OpenAccountCommand command) {
-        var customer = customerRepository.find(command.getCustomerId());
-        var number = accountNumberGenerator.generate();
-        var account = new Account(customer.getId(), number, command.getCurrency());
-        accountRepository.save(account);
+        Mono.zip(
+            customerRepository.find(command.getCustomerId()),
+            accountNumberGenerator.generate()
+        ).map(tuple ->
+            new Account(tuple.getT1().getId(), tuple.getT2(), command.getCurrency())
+        ).flatMap(accountRepository::save).block();
     }
 }
 

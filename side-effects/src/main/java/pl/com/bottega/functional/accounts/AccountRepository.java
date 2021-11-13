@@ -1,8 +1,10 @@
 package pl.com.bottega.functional.accounts;
 
+import reactor.core.publisher.Mono;
+
 interface AccountRepository {
-    Account find(AccountNumber accountNumber) throws NoSuchAccountException;
-    void save(Account account);
-    AccountNumber nextNumber();
+    Mono<Account> find(AccountNumber accountNumber);
+    Mono<Void> save(Account account);
+    Mono<AccountNumber> nextNumber();
     class NoSuchAccountException extends RuntimeException { }
 }

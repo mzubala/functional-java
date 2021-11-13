@@ -53,9 +53,9 @@ public class DepositFundsTest {
     @Test
     void respondsWithUnprocessableEntityWhenAccountCurrencyIsDifferentThanDepositAmount() {
         // given
-        customerRepository.save(FIRST_CUSTOMER);
+        customerRepository.save(FIRST_CUSTOMER).block();
         var account = anAccount().withCustomerId(FIRST_CUSTOMER.getId()).withBalance(Money.zero(EUR)).withVersion(null).build();
-        accountRepository.save(account);
+        accountRepository.save(account).block();
 
         // expect
         client.depositFunds(

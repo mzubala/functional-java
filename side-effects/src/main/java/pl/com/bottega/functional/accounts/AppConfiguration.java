@@ -14,47 +14,35 @@ class AppConfiguration {
 
     @Bean
     Handler<TransferCommand> transferFundsHandler(
-            AccountRepository accountRepository,
-            TransactionTemplate transactionTemplate
+        AccountRepository accountRepository
     ) {
-        return new TransactionalHandler(
-                transactionTemplate,
-                new DefaultTransferFundsHandler(accountRepository)
-        );
+        return new TransactionalHandler(new DefaultTransferFundsHandler(accountRepository));
     }
 
     @Bean
-    Handler<WithdrawFundsCommand> withdrawFundsCommandHandler(
-            AccountRepository accountRepository,
-            TransactionTemplate transactionTemplate
-    ) {
+    Handler<WithdrawFundsCommand> withdrawFundsCommandHandler(AccountRepository accountRepository) {
         return new TransactionalHandler<>(
-                transactionTemplate,
-                new DefaultWithdrawFundsHandler(accountRepository)
+            new DefaultWithdrawFundsHandler(accountRepository)
         );
     }
 
     @Bean
     Handler<DepositFundsCommand> depositFundsCommandHandler(
-            AccountRepository accountRepository,
-            TransactionTemplate transactionTemplate
+        AccountRepository accountRepository
     ) {
         return new TransactionalHandler<>(
-                transactionTemplate,
-                new DefaultDepositFundsHandler(accountRepository)
+            new DefaultDepositFundsHandler(accountRepository)
         );
     }
 
     @Bean
     Handler<OpenAccountCommand> openAccountCommandHandler(
-            CustomerRepository customerRepository,
-            AccountRepository accountRepository,
-            AccountNumberGenerator accountNumberGenerator,
-            TransactionTemplate transactionTemplate
+        CustomerRepository customerRepository,
+        AccountRepository accountRepository,
+        AccountNumberGenerator accountNumberGenerator
     ) {
         return new TransactionalHandler<>(
-                transactionTemplate,
-                new DefaultOpenAccountHandler(customerRepository, accountNumberGenerator, accountRepository)
+            new DefaultOpenAccountHandler(customerRepository, accountNumberGenerator, accountRepository)
         );
     }
 
