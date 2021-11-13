@@ -26,6 +26,7 @@ class DefaultOpenAccountHandler implements OpenAccountHandler {
     private final AccountRepository accountRepository;
 
     @Override
+    // TODO write this method using reactive stream comming from repository with block at the end
     public void handle(OpenAccountCommand command) {
         var customer = customerRepository.find(command.getCustomerId());
         var number = accountNumberGenerator.generate();

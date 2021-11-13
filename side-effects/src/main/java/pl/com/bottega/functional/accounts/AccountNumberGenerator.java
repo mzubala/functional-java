@@ -2,6 +2,7 @@ package pl.com.bottega.functional.accounts;
 
 import lombok.AllArgsConstructor;
 
+// TODO change API so that we return reactive type (Mono)
 interface AccountNumberGenerator {
     AccountNumber generate();
 }

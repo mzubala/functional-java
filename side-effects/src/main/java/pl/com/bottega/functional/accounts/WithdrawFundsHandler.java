@@ -21,6 +21,7 @@ class DefaultWithdrawFundsHandler implements WithdrawFundsHandler {
     private final AccountRepository accountRepository;
 
     @Override
+    // TODO write this method using reactive stream comming from repository with block at the end
     public void handle(WithdrawFundsCommand command) {
         var account = accountRepository.find(command.getDestination());
         account.debit(command.getAmount()).andThen(accountRepository::save).get();

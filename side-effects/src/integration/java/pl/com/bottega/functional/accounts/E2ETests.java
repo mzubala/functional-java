@@ -32,7 +32,9 @@ class E2ETests {
 
     @BeforeEach
     void setup() {
+        // TODO add blocking here after repository api change
         customerRepository.save(FIRST_CUSTOMER);
+        // TODO add blocking here after repository api change
         customerRepository.save(SECOND_CUSTOMER);
     }
 

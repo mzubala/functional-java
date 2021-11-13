@@ -15,11 +15,13 @@ class AccountsReaderAdapter implements AccountsReader {
 
     @Override
     public List<AccountDto> getAccountsOf(CustomerId customerId) {
+        // TODO convert Flux to Stream then collect to List
         return repository.findByCustomerId(customerId.getValue()).map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
     public AccountDto getAccount(AccountNumber accountNumber) throws NoSuchAccountException {
+        // TODO just block
         return repository.findByNumber(accountNumber.getValue())
             .map(this::toDto)
             .orElseThrow(NoSuchAccountException::new);

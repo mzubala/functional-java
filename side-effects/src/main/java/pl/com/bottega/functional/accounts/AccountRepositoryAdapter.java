@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 
 @Component
 @AllArgsConstructor
+// TODO adjust adapter to changed APIs
 class AccountRepositoryAdapter implements AccountRepository {
 
     private final SpringDataAccountRepository repository;
@@ -43,7 +44,9 @@ class AccountRepositoryAdapter implements AccountRepository {
     }
 }
 
+// TODO change API so that we return reactive types (Mono, Flux)
 interface SpringDataAccountRepository extends Repository<AccountEntity, String> {
+    // TODO no need for optional, since Mono can be empty
     Optional<AccountEntity> findByNumber(String number);
 
     void save(AccountEntity account);

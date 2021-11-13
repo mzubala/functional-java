@@ -15,6 +15,7 @@ import java.util.UUID;
 
 @AllArgsConstructor
 @Component
+// TODO adjust impl to changed APIs
 public class CustomerRepositoryAdapter implements CustomerRepository {
 
     private final SpringDataCustomerRepository repository;
@@ -30,6 +31,7 @@ public class CustomerRepositoryAdapter implements CustomerRepository {
     }
 }
 
+// TODO return reactive Mono
 interface SpringDataCustomerRepository extends Repository<CustomerEntity, UUID> {
     void save(CustomerEntity customerEntity);
 

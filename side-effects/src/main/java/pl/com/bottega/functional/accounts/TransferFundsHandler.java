@@ -30,6 +30,7 @@ class DefaultTransferFundsHandler implements TransferFundsHandler {
     private final AccountRepository accountRepository;
 
     @Override
+    // TODO write this method using reactive stream comming from repository with block at the end
     public void handle(TransferCommand command) {
         final var sourceAccount = accountRepository.find(command.getSource());
         final var targetAccount = accountRepository.find(command.getDestination());
