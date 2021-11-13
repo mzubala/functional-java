@@ -4,11 +4,6 @@ import pl.com.bottega.reactor.domain.User;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-/**
- * Learn how to turn Reactive API to blocking one.
- *
- * @author Sebastien Deleuze
- */
 public class Part10ReactiveToBlocking {
 
 //========================================================================================

@@ -21,12 +21,6 @@ import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-/**
- * Learn how to deal with errors.
- *
- * @author Sebastien Deleuze
- * @see Exceptions#propagate(Throwable)
- */
 public class Part07Errors {
 
 //========================================================================================

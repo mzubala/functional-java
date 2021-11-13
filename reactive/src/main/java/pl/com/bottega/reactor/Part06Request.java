@@ -6,11 +6,6 @@ import pl.com.bottega.reactor.repository.ReactiveUserRepository;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
-/**
- * Learn how to control the demand.
- *
- * @author Sebastien Deleuze
- */
 public class Part06Request {
 
     ReactiveRepository<User> repository = new ReactiveUserRepository();

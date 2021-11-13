@@ -4,11 +4,6 @@ import pl.com.bottega.reactor.domain.User;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-/**
- * Learn how to use various other operators.
- *
- * @author Sebastien Deleuze
- */
 public class Part08OtherOperations {
 
 //========================================================================================
