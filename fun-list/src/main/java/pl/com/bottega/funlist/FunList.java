@@ -15,7 +15,7 @@ public interface FunList<T> {
     }
 
     static <T> FunList<T> empty() {
-        throw new IllegalStateException("Not yet implemented");
+        return EmptyList.INSTANCE;
     }
 
     FunList<T> append(T element);
