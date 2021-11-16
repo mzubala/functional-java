@@ -278,6 +278,8 @@ final class NonEmptyList<T> implements FunList<T> {
         var startNormalized = Math.min(Math.max(start, 0), size - 1);
         var endNormalized = Math.min(Math.max(end, 0), size - 1);
         return sliceRec(startNormalized, endNormalized);
+
+
     }
 
     private FunList<T> sliceRec(Integer start, Integer end) {
@@ -316,7 +318,11 @@ final class NonEmptyList<T> implements FunList<T> {
 
     @Override
     public Optional<T> foldLeft(BinaryOperator<T> op) {
-        return tail.foldLeft(op).map((tailMapped) -> op.apply(head, tailMapped)).or(() -> Optional.of(head));
+        if(tail == EMPTY) {
+            return Optional.of(head);
+        } else {
+            return Optional.of(tail.foldLeft(head, op));
+        }
     }
 
     @Override

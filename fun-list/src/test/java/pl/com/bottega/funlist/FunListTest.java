@@ -278,6 +278,17 @@ class FunListTest {
     }
 
     @Test
+    void foldsListToSingleElementOfTheListTypeFromTheLeftUsingSubtraction() {
+        var numbers = FunList.of(1, 2, 3, 4, 5);
+
+        var sum = numbers.foldLeft((acc, element) -> acc - element).get();
+        var singleElementSum = numbers.slice(0, 0).foldLeft((acc, element) -> acc - element).get();
+
+        assertThat(sum).isEqualTo(1 - 2 - 3 - 4 - 5);
+        assertThat(singleElementSum).isEqualTo(1);
+    }
+
+    @Test
     void foldsEmptyListToSingleElementOfTheListType() {
         var empty = FunList.empty();
         var op = mock(BinaryOperator.class);
