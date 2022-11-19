@@ -21,8 +21,8 @@ public class DbExtension implements BeforeEachCallback {
         var template = context.getBean(R2dbcEntityTemplate.class);
         var dbClient = template.getDatabaseClient();
         dbClient.sql("SHOW TABLES")
-            .map(row -> row.get("tablename")).all().cast(String.class)
-            .flatMap((tablename) -> dbClient.sql("TRUNCATE TABLE " + tablename + " CASCADE").then())
+            .map(row -> row.get("TABLE_NAME")).all().cast(String.class)
+            .flatMap((tablename) -> dbClient.sql("DELETE FROM \"" + tablename + "\"").then())
             .then().block();
     }
 }
