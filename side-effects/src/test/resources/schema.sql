@@ -1,8 +1,8 @@
 create table customers
 (
     id         uuid primary key,
-    first_name text   not null,
-    last_name  text   not null,
+    first_name character varying(255)   not null,
+    last_name  character varying(255)   not null,
     version    bigint not null
 );
 
