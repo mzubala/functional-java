@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@ExtendWith(PostgresDbExtension.class)
+@ExtendWith(DbExtension.class)
 @SpringBootTest(
         classes = {App.class, IntegrationTestConfig.class},
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
