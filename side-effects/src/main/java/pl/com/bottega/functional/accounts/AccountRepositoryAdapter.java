@@ -63,17 +63,20 @@ interface SpringDataAccountRepository extends Repository<AccountEntity, String> 
 @AllArgsConstructor
 class AccountEntity {
     @Id
+    @Column("number")
     private String number;
 
     @Column("customer_id")
     private UUID customerId;
 
+    @Column("balance")
     private BigDecimal balance;
 
     @Column("currency_code")
     private String currencyCode;
 
     @Version
+    @Column("version")
     private Long version;
 
     static AccountEntity of(Account account) {
