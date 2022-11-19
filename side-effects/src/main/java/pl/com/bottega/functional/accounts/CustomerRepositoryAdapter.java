@@ -42,6 +42,7 @@ interface SpringDataCustomerRepository extends Repository<CustomerEntity, UUID> 
 @Table("customers")
 class CustomerEntity {
     @Id
+    @Column("id")
     private UUID id;
 
     @Column("first_name")
@@ -51,6 +52,7 @@ class CustomerEntity {
     private String lastName;
 
     @Version
+    @Column("version")
     private Long version;
 
     static CustomerEntity of(Customer customer) {

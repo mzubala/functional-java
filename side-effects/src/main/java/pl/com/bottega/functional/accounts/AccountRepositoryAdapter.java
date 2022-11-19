@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.Currency;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -61,17 +60,20 @@ interface SpringDataAccountRepository extends Repository<AccountEntity, String> 
 @AllArgsConstructor
 class AccountEntity {
     @Id
+    @Column("number")
     private String number;
 
     @Column("customer_id")
     private UUID customerId;
 
+    @Column("balance")
     private BigDecimal balance;
 
     @Column("currency_code")
     private String currencyCode;
 
     @Version
+    @Column("version")
     private Long version;
 
     static AccountEntity of(Account account) {
