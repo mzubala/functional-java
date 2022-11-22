@@ -21,15 +21,35 @@ class Money {
     }
 
     Try<Money> add(Money other) {
-        return null;
+        return checkCurrencies(other).map(this::safeAdd);
+    }
+
+    private Try<Money> checkCurrencies(Money other) {
+        if(other.currency.equals(currency)) {
+            return Try.success(other);
+        } else {
+            return Try.failure(new IncompatibleCurrenciesException());
+        }
+    }
+
+    private Money safeAdd(Money other) {
+        return new Money(value.add(other.value), currency);
     }
 
     Try<Money> subtract(Money other) {
-        return null;
+        if(other.currency.equals(currency)) {
+            return Try.success(new Money(value.subtract(other.value), currency));
+        } else {
+            return Try.failure(new IncompatibleCurrenciesException());
+        }
     }
 
     Try<Boolean> isGreaterThan(Money other) {
-        return null;
+        if(other.currency.equals(currency)) {
+            return Try.success(value.compareTo(other.value) > 0);
+        } else {
+            return Try.failure(new IncompatibleCurrenciesException());
+        }
     }
 
     Try<Boolean> isLessThan(Money other) {

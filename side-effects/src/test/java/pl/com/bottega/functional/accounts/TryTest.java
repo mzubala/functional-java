@@ -22,6 +22,8 @@ class TryTest {
         assertThat(longSuccess.get()).isEqualTo(50L);
         assertThatThrownBy(() -> failedLong.get()).isInstanceOf(IllegalArgumentException.class).hasMessage("error");
         assertThatThrownBy(() -> failedString.get()).isInstanceOf(RuntimeException.class).hasMessage("error");
+        assertThat(stringSuccess.isSuccess()).isTrue();
+        assertThat(failedString.isFailure()).isTrue();
     }
 
     @Test
