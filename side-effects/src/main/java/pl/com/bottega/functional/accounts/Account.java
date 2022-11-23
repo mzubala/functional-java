@@ -31,17 +31,15 @@ class Account {
                 return Try.failure(new InsufficientFundsException());
             }
             return balance.subtract(amount);
-        }).map(newBalance -> {
-            this.balance = newBalance;
-            return null;
-        });
+        }).andThen(this::updateBalance);
+    }
+
+    private void updateBalance(Money newBalance) {
+        this.balance = newBalance;
     }
 
     public Try<?> credit(Money amount) {
-        return balance.add(amount).map((newBalance) -> {
-            this.balance = newBalance;
-            return null;
-        });
+        return balance.add(amount).andThen(this::updateBalance);
     }
 
     public AccountNumber getNumber() {
