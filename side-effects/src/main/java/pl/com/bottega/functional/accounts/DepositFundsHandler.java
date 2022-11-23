@@ -21,9 +21,10 @@ class DefaultDepositFundsHandler implements DepositFundsHandler {
     private final AccountRepository accountRepository;
 
     @Override
-    // TODO write this method using reactive stream comming from repository with block at the end
     public void handle(DepositFundsCommand command) {
-        var account = accountRepository.find(command.getDestination());
-        account.credit(command.getAmount()).andThen(accountRepository::save).get();
+        accountRepository.find(command.getDestination()).flatMap((account) ->
+            account.credit(command.getAmount())
+                .map(accountRepository::save)
+                .get()).block();
     }
 }

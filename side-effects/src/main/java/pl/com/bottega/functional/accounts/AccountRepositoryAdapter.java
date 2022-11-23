@@ -10,51 +10,50 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.data.repository.Repository;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.util.Currency;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 @Component
 @AllArgsConstructor
-// TODO adjust adapter to changed APIs
 class AccountRepositoryAdapter implements AccountRepository {
 
     private final SpringDataAccountRepository repository;
 
     @Override
-    public Account find(AccountNumber accountNumber) throws NoSuchAccountException {
+    public Mono<Account> find(AccountNumber accountNumber) throws NoSuchAccountException {
         return repository.findByNumber(accountNumber.getValue())
-                .orElseThrow(NoSuchAccountException::new)
-                .toDomain();
+            .map(AccountEntity::toDomain)
+            .switchIfEmpty(Mono.error(new NoSuchAccountException()));
+
     }
 
     @Override
-    public void save(Account account) {
-        repository.save(AccountEntity.of(account));
+    public Mono<Void> save(Account account) {
+        return repository.save(AccountEntity.of(account));
     }
 
     @Override
-    public AccountNumber nextNumber() {
-        var number = repository.nextAccountSequenceNumber();
-        var numberString = String.format("%016d", number);
-        return new AccountNumber(numberString);
+    public Mono<AccountNumber> nextNumber() {
+        return repository.nextAccountSequenceNumber().map((number) -> {
+            var numberString = String.format("%016d", number);
+            return new AccountNumber(numberString);
+        });
     }
 }
 
-// TODO change API so that we return reactive types (Mono, Flux)
 interface SpringDataAccountRepository extends Repository<AccountEntity, String> {
-    // TODO no need for optional, since Mono can be empty
-    Optional<AccountEntity> findByNumber(String number);
+    Mono<AccountEntity> findByNumber(String number);
 
-    void save(AccountEntity account);
+    Mono<Void> save(AccountEntity account);
 
     @Query("SELECT nextval('account_number_sequence')")
-    Long nextAccountSequenceNumber();
+    Mono<Long> nextAccountSequenceNumber();
 
-    Stream<AccountEntity> findByCustomerId(UUID customerId);
+    Flux<AccountEntity> findByCustomerId(UUID customerId);
 }
 
 @Table("accounts")
