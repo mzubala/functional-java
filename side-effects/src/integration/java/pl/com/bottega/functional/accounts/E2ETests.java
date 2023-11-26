@@ -3,6 +3,7 @@ package pl.com.bottega.functional.accounts;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import pl.com.bottega.functional.accounts.AccountsController.DepositFundsRequest;
 import pl.com.bottega.functional.accounts.AccountsController.OpenAccountRequest;
 import pl.com.bottega.functional.accounts.AccountsController.TransferFundsRequest;
@@ -11,17 +12,10 @@ import pl.com.bottega.functional.accounts.AccountsController.WithdrawFundsReques
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static pl.com.bottega.functional.accounts.ExampleIntegrationTestData.EUR;
-import static pl.com.bottega.functional.accounts.ExampleIntegrationTestData.FIRST_CUSTOMER;
-import static pl.com.bottega.functional.accounts.ExampleIntegrationTestData.FIRST_CUSTOMER_ID;
-import static pl.com.bottega.functional.accounts.ExampleIntegrationTestData.FIVE_USD;
-import static pl.com.bottega.functional.accounts.ExampleIntegrationTestData.SECOND_CUSTOMER;
-import static pl.com.bottega.functional.accounts.ExampleIntegrationTestData.SECOND_CUSTOMER_ID;
-import static pl.com.bottega.functional.accounts.ExampleIntegrationTestData.TEN_EUR;
-import static pl.com.bottega.functional.accounts.ExampleIntegrationTestData.TEN_USD;
-import static pl.com.bottega.functional.accounts.ExampleIntegrationTestData.USD;
+import static pl.com.bottega.functional.accounts.ExampleIntegrationTestData.*;
 
 @IntegrationTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class E2ETests {
 
     @Autowired
