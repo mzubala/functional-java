@@ -3,28 +3,27 @@ package pl.com.bottega.functional.accounts;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import pl.com.bottega.functional.accounts.AccountRepository.NoSuchAccountException;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
+// TODO change to return reactive types
 class AccountsReaderAdapter implements AccountsReader {
 
     private final SpringDataAccountRepository repository;
 
     @Override
-    public Flux<AccountDto> getAccountsOf(CustomerId customerId) {
-        return repository.findByCustomerId(customerId.getValue()).map(this::toDto);
+    public List<AccountDto> getAccountsOf(CustomerId customerId) {
+        return repository.findByCustomerId(customerId.getValue()).map(this::toDto).toStream().collect(Collectors.toList());
     }
 
     @Override
-    public Mono<AccountDto> getAccount(AccountNumber accountNumber) {
+    public AccountDto getAccount(AccountNumber accountNumber) throws NoSuchAccountException {
         return repository.findByNumber(accountNumber.getValue())
-            .map(this::toDto)
-            .switchIfEmpty(Mono.error(NoSuchAccountException::new));
+            .map(this::toDto).block();
     }
 
     private AccountDto toDto(AccountEntity accountEntity) {

@@ -33,12 +33,13 @@ class CommandGateway {
         );
     }
 
+    // TODO change implementation to return Mono (do not throw exception)
     Mono<Void> execute(Command command) {
         Class<? extends Command> commandClass = command.getClass();
         Handler handler = handlersMap.get(commandClass.getTypeName());
         if(handler == null) {
             throw new IllegalArgumentException("No handler found for " + command.getClass().getName());
         }
-        return handler.handle(command);
+        handler.handle(command);
     }
 }

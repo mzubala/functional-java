@@ -17,14 +17,15 @@ interface WithdrawFundsHandler extends Handler<WithdrawFundsCommand> {
 }
 
 @AllArgsConstructor
+// TODO implement new interface
 class DefaultWithdrawFundsHandler implements WithdrawFundsHandler {
 
     private final AccountRepository accountRepository;
 
     @Override
-    public Mono<Void> handle(WithdrawFundsCommand command) {
-        return accountRepository.find(command.getDestination())
+    public void handle(WithdrawFundsCommand command) {
+        accountRepository.find(command.getDestination())
             .map(account -> account.debit(command.getAmount()).get())
-            .flatMap(accountRepository::save);
+            .flatMap(accountRepository::save).block();
     }
 }

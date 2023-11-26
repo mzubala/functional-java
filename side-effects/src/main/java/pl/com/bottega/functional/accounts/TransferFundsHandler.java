@@ -27,13 +27,14 @@ interface TransferFundsHandler extends Handler<TransferCommand> {
 }
 
 @AllArgsConstructor
+// TODO implement new handler interface
 class DefaultTransferFundsHandler implements TransferFundsHandler {
 
     private final AccountRepository accountRepository;
 
     @Override
-    public Mono<Void> handle(TransferCommand command) {
-        return Mono.zip(
+    public void handle(TransferCommand command) {
+        Mono.zip(
                 accountRepository.find(command.getSource()),
                 accountRepository.find(command.getDestination())
             ).flatMapMany((accounts) ->
@@ -44,6 +45,6 @@ class DefaultTransferFundsHandler implements TransferFundsHandler {
                 ))
             ).cast(Account.class)
             .flatMap(accountRepository::save)
-            .then();
+            .then().block();
     }
 }

@@ -2,8 +2,8 @@ package pl.com.bottega.functional.accounts;
 
 import org.springframework.transaction.reactive.TransactionalOperator;
 import pl.com.bottega.functional.accounts.Handler.Command;
-import reactor.core.publisher.Mono;
 
+// TODO implement new handler interface
 class TransactionalHandler<CommandType extends Command> extends HandlerDecorator<CommandType> {
 
     private final TransactionalOperator transactionalOperator;
@@ -14,7 +14,8 @@ class TransactionalHandler<CommandType extends Command> extends HandlerDecorator
     }
 
     @Override
-    public Mono<Void> handle(CommandType command) {
-        return transactionalOperator.execute(status -> decorated.handle(command)).then();
+    public void handle(CommandType command) {
+        // TODO use transctionalOperator to ensure transaction
+        decorated.handle(command);
     }
 }

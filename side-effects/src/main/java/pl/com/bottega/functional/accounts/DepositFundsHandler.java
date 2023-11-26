@@ -17,14 +17,15 @@ interface DepositFundsHandler extends Handler<DepositFundsCommand> {
 }
 
 @AllArgsConstructor
+// TODO implement new handler interface
 class DefaultDepositFundsHandler implements DepositFundsHandler {
 
     private final AccountRepository accountRepository;
 
     @Override
-    public Mono<Void> handle(DepositFundsCommand command) {
-        return accountRepository.find(command.getDestination())
+    public void handle(DepositFundsCommand command) {
+        accountRepository.find(command.getDestination())
             .map((account) -> account.credit(command.getAmount()).get())
-            .flatMap(accountRepository::save);
+            .flatMap(accountRepository::save).block();
     }
 }

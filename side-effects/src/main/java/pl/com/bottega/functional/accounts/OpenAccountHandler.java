@@ -20,6 +20,7 @@ interface OpenAccountHandler extends Handler<OpenAccountCommand> {
 }
 
 @AllArgsConstructor
+// TODO implement new handler interface
 class DefaultOpenAccountHandler implements OpenAccountHandler {
 
     private final CustomerRepository customerRepository;
@@ -27,13 +28,13 @@ class DefaultOpenAccountHandler implements OpenAccountHandler {
     private final AccountRepository accountRepository;
 
     @Override
-    public Mono<Void> handle(OpenAccountCommand command) {
-        return Mono.zip(
+    public void handle(OpenAccountCommand command) {
+        Mono.zip(
             customerRepository.find(command.getCustomerId()),
             accountNumberGenerator.generate()
         ).map(tuple ->
             new Account(tuple.getT1().getId(), tuple.getT2(), command.getCurrency())
-        ).flatMap(accountRepository::save);
+        ).flatMap(accountRepository::save).block();
     }
 }
 
