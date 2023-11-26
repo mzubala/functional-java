@@ -1,10 +1,9 @@
 package pl.com.bottega.functional.accounts;
 
-import com.github.javafaker.Faker;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.With;
+import net.datafaker.Faker;
 
 import java.math.BigDecimal;
 import java.util.Currency;
