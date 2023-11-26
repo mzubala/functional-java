@@ -37,14 +37,11 @@ class DefaultTransferFundsHandler implements TransferFundsHandler {
         Mono.zip(
                 accountRepository.find(command.getSource()),
                 accountRepository.find(command.getDestination())
-            ).flatMapMany((accounts) ->
-                Flux.fromIterable(accounts.mapT1(
-                    sourceAccount -> sourceAccount.debit(command.getAmount()).get()
-                ).mapT2(
-                    targetAccount -> targetAccount.credit(command.getAmount()).get()
-                ))
-            ).cast(Account.class)
-            .flatMap(accountRepository::save)
-            .then().block();
+        ).flatMap((accounts) -> {
+            var saved = accounts
+                    .mapT1(source -> accountRepository.save(source.debit(command.getAmount()).get()))
+                    .mapT2(dest -> accountRepository.save(dest.credit(command.getAmount()).get()));
+            return saved.getT1().zipWith(saved.getT2());
+        }).block();
     }
 }
