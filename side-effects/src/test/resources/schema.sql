@@ -1,4 +1,4 @@
-create table customers
+create table if not exists customers
 (
     id         uuid primary key,
     first_name text   not null,
@@ -6,7 +6,7 @@ create table customers
     version    bigint not null
 );
 
-create table accounts
+create table if not exists accounts
 (
     number        character varying(17) primary key,
     customer_id   uuid   not null references customers (id),
@@ -15,4 +15,4 @@ create table accounts
     version       bigint not null
 );
 
-create sequence account_number_sequence;
+create sequence if not exists account_number_sequence;
