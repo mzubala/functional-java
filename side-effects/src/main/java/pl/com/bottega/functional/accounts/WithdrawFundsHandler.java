@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Value;
 import reactor.core.publisher.Mono;
 
+import static pl.com.bottega.functional.accounts.TryHelper.toMono;
 import static pl.com.bottega.functional.accounts.WithdrawFundsHandler.*;
 
 interface WithdrawFundsHandler extends Handler<WithdrawFundsCommand> {
@@ -24,7 +25,7 @@ class DefaultWithdrawFundsHandler implements WithdrawFundsHandler {
     @Override
     public Mono<Void> handle(WithdrawFundsCommand command) {
         return accountRepository.find(command.getDestination())
-            .map(account -> account.debit(command.getAmount()).get())
+            .flatMap(account -> toMono(account.debit(command.getAmount())))
             .flatMap(accountRepository::save);
     }
 }

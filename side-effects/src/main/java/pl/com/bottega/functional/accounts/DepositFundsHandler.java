@@ -5,6 +5,7 @@ import lombok.Value;
 import reactor.core.publisher.Mono;
 
 import static pl.com.bottega.functional.accounts.DepositFundsHandler.DepositFundsCommand;
+import static pl.com.bottega.functional.accounts.TryHelper.toMono;
 
 interface DepositFundsHandler extends Handler<DepositFundsCommand> {
     Mono<Void> handle(DepositFundsCommand command);
@@ -24,7 +25,7 @@ class DefaultDepositFundsHandler implements DepositFundsHandler {
     @Override
     public Mono<Void> handle(DepositFundsCommand command) {
         return accountRepository.find(command.getDestination())
-            .map((account) -> account.credit(command.getAmount()).get())
+            .flatMap((account) -> toMono(account.credit(command.getAmount())))
             .flatMap(accountRepository::save);
     }
 }

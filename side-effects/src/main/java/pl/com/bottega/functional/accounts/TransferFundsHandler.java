@@ -7,6 +7,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import static pl.com.bottega.functional.accounts.TransferFundsHandler.TransferCommand;
+import static pl.com.bottega.functional.accounts.TryHelper.toMono;
 
 interface TransferFundsHandler extends Handler<TransferCommand> {
 

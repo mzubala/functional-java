@@ -44,7 +44,7 @@ class CommandGatewayTest {
         var gateway = new CommandGateway(list(secondCommandHandler));
 
         // when
-        assertThrows(IllegalArgumentException.class, () -> gateway.execute(firstCommand));
+        assertThrows(IllegalArgumentException.class, () -> gateway.execute(firstCommand).block());
     }
 
     @Test
