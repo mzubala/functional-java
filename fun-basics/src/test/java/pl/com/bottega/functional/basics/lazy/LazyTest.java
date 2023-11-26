@@ -9,12 +9,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class LazyTest {
 
@@ -30,7 +25,7 @@ public class LazyTest {
 
         var lazy = Lazy.of(expression);
 
-        verifyZeroInteractions(expression);
+        verifyNoInteractions(expression);
     }
 
     @Test
@@ -105,8 +100,8 @@ public class LazyTest {
 
         Lazy mappedLazy = lazy.map(mapper);
 
-        verifyZeroInteractions(expression);
-        verifyZeroInteractions(mapper);
+        verifyNoInteractions(expression);
+        verifyNoInteractions(mapper);
     }
 
     @Test
@@ -143,8 +138,8 @@ public class LazyTest {
 
         Lazy mappedLazy = lazy.flatMap(mapper);
 
-        verifyZeroInteractions(expression);
-        verifyZeroInteractions(mapper);
+        verifyNoInteractions(expression);
+        verifyNoInteractions(mapper);
     }
 
     @Test
