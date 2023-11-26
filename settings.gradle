@@ -3,4 +3,5 @@ include 'side-effects'
 include 'fun-list'
 include 'fun-basics'
 include 'reactive'
+include 'concurrency'
 
