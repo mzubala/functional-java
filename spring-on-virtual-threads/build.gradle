@@ -1,0 +1,40 @@
+plugins {
+    id 'org.springframework.boot' version '3.2.0'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+    id 'io.freefair.lombok' version '8.4'
+}
+
+group = 'pl.com.bottega'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    implementation 'org.jsoup:jsoup:1.17.1'
+    implementation 'io.vavr:vavr:0.10.4'
+    implementation 'com.h2database:h2'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.assertj:assertj-core:3.21.0'
+    testImplementation 'net.datafaker:datafaker:1.5.0'
+    testImplementation 'org.assertj:assertj-vavr:0.4.2'
+}
+
+test {
+    useJUnitPlatform()
+}
+tasks.withType(JavaCompile) {
+    options.compilerArgs += '--enable-preview'
+}
+tasks.withType(Test) {
+    jvmArgs += '--enable-preview'
+}
+tasks.withType(JavaExec) {
+    jvmArgs += '--enable-preview'
+}

@@ -15,6 +15,6 @@ class TransactionalHandler<CommandType extends Command> extends HandlerDecorator
 
     @Override
     public Mono<Void> handle(CommandType command) {
-        return transactionalOperator.execute(status -> decorated.handle(command)).then();
+        return transactionalOperator.transactional(decorated.handle(command));
     }
 }

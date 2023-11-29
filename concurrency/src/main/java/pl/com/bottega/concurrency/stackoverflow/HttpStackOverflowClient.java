@@ -25,7 +25,7 @@ public class HttpStackOverflowClient implements StackOverflowClient {
 	}
 
 	private String fetchTitleOnline(String tag) {
-		return mostRecentQuestionsAbout(tag).select("a.question-hyperlink").get(0).text();
+		return mostRecentQuestionsAbout(tag).select(".s-post-summary a.s-link").get(0).text();
 	}
 
 }
