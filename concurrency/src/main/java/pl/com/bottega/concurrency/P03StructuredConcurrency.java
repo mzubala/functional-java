@@ -11,6 +11,8 @@ import java.util.concurrent.StructuredTaskScope;
 import java.util.concurrent.ThreadFactory;
 import java.util.stream.IntStream;
 
+import static java.util.concurrent.StructuredTaskScope.Subtask.State.SUCCESS;
+
 @Slf4j
 class P03StructuredConcurrency {
 
@@ -41,7 +43,30 @@ class P03StructuredConcurrency {
             scope.join();
             System.out.println(javaHeadline.get());
             System.out.println(kotlinHeadline.get());
-            System.out.println(scalaHeadline.get());
+            if(scalaHeadline.state() == SUCCESS) {
+                System.out.println(scalaHeadline.get());
+            } else {
+                log.error("Scala Error", scalaHeadline.exception());
+            }
+        }
+    }
+
+    @SneakyThrows
+    void finishWhenOneTaskFails() {
+        var loggingClient = new ArtificialSleepWrapper(new LoggingWrapper(new HttpStackOverflowClient()));
+        var errorThrowingClient = new InjectErrorsWrapper(loggingClient, "scala");
+        try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+            var scalaHeadline = scope.fork(() -> headlineAbout("scala", errorThrowingClient));
+            var javaHeadline = scope.fork(() -> headlineAbout("java", loggingClient));
+            var kotlinHeadline = scope.fork(() -> headlineAbout("kotlin", loggingClient));
+            scope.join();
+            System.out.println(javaHeadline.get());
+            System.out.println(kotlinHeadline.get());
+            if(scalaHeadline.state() == SUCCESS) {
+                System.out.println(scalaHeadline.get());
+            } else {
+                log.error("Scala Error", scalaHeadline.exception());
+            }
         }
     }
 
@@ -49,7 +74,7 @@ class P03StructuredConcurrency {
     void finishingAfterFirstSuccessfulTaskWithJustSleeping() {
         var faker = new Faker();
         String result;
-        try (var scope = new StructuredTaskScope.ShutdownOnSuccess()) {
+        try (var scope = new StructuredTaskScope.ShutdownOnSuccess<String>()) {
             IntStream.range(0, 50000).mapToObj(i -> scope.fork(() -> {
                 var sleepTime = faker.random().nextInt(1000);
                 log.info(STR."Starting task \{i} with sleep time \{sleepTime}");
@@ -70,7 +95,7 @@ class P03StructuredConcurrency {
         var slowClient = new FallbackStubClient(new ArtificialSleepWrapper(loggingClient));
         String result;
         try (var scope = new StructuredTaskScope.ShutdownOnSuccess()) {
-            IntStream.range(0, 50000).mapToObj(i -> scope.fork(() -> {
+            IntStream.range(0, 600).mapToObj(i -> scope.fork(() -> {
                 log.info(STR."Starting task \{i}");
                 var toRet = headlineAbout(faker.animal().name(), slowClient);
                 log.info("Ending task " + i);
@@ -88,17 +113,17 @@ class P03StructuredConcurrency {
         try (var scope = new StructuredTaskScope.ShutdownOnSuccess()) {
             for(int i = 0; i<5; i++) {
                 scope.fork(() -> {
-                    /*while(true) {
+                    while(true) {
                         System.out.println("I'm doing it");
-                    }*/
-                    for(int j = 0; j<100000; j++) {
+                    }
+                    /*for(int j = 0; j<100000; j++) {
                         System.out.println("Reading");
                         try(var lines = Files.lines(Path.of(getClass().getResource("/dictionary.txt").toURI()))) {
                             lines.toList();
                         }
                         System.out.println("Reading finished");
-                    }
-                    return "All done";
+                    }*/
+                    //return "All done";
                 });
             }
             scope.fork(() -> {

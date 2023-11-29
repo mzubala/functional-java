@@ -1,6 +1,7 @@
 package pl.com.bottega.springonvirtual;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.task.AsyncTaskExecutor;
@@ -14,12 +15,15 @@ import pl.com.bottega.springonvirtual.stackoverflow.StackOverflowClient;
 @RequiredArgsConstructor
 class SampleController {
 
-    private final StackOverflowClient client;
+    private final StackOverflowService service;
 
     @GetMapping("/sample")
+    @SneakyThrows
     String getSample() {
         log.info("Am I run on a virtual thread? {}", Thread.currentThread().isVirtual() ? "yes ;)" : "no ;/");
-        return client.mostRecentQuestionAbout("java");
+        var future = service.getLatestHeadlineAbout("java");
+        future.join();
+        return future.get();
     }
 
 }

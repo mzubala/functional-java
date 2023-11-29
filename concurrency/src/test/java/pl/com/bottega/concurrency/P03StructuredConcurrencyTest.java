@@ -15,8 +15,9 @@ class P03StructuredConcurrencyTest {
 
     @Test
     void failWhenOneTaskFails() {
-        assertThatThrownBy(sut::whatHappensWhenOneTaskFails)
-                .isInstanceOf(IllegalStateException.class);
+        //assertThatThrownBy(sut::whatHappensWhenOneTaskFails)
+         //       .isInstanceOf(IllegalStateException.class);
+        sut.whatHappensWhenOneTaskFails();
     }
 
     @Test
@@ -32,6 +33,11 @@ class P03StructuredConcurrencyTest {
     @Test
     void finishAsSoonAsFirstTaskCompletesInfiniteLoop() {
         sut.finishingAfterFirstSuccessfulTaskWithInfiniteLoop();
+    }
+
+    @Test
+    void finishWhenOneTaskFails() {
+        sut.finishWhenOneTaskFails();
     }
 
 }

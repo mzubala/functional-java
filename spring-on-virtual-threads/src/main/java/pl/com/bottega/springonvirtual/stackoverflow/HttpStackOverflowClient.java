@@ -36,8 +36,8 @@ class HttpStackOverflowClientConfig {
         HttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter(Charset.forName("UTF-8"));
         return new RestTemplateBuilder()
                 .rootUri("https://stackoverflow.com")
-                .setConnectTimeout(Duration.ofMillis(500))
-                .setReadTimeout(Duration.ofMillis(1000))
+                .setConnectTimeout(Duration.ofMillis(1000))
+                .setReadTimeout(Duration.ofMillis(10000))
                 .messageConverters(stringHttpMessageConverter)
                 .build();
     }
