@@ -24,7 +24,7 @@ class AccountRepositoryAdapter implements AccountRepository {
     private final SpringDataAccountRepository repository;
 
     @Override
-    public Mono<Account> find(AccountNumber accountNumber) throws NoSuchAccountException {
+    public Mono<Account> find(AccountNumber accountNumber) {
         return repository.findByNumber(accountNumber.getValue())
             .switchIfEmpty(Mono.error(NoSuchAccountException::new))
             .map(AccountEntity::toDomain);

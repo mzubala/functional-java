@@ -34,7 +34,7 @@ class DefaultTransferFundsHandler implements TransferFundsHandler {
 
     @Override
     public void handle(TransferCommand command) {
-        Mono.zip(
+        /*Mono.zip(
                 accountRepository.find(command.getSource()),
                 accountRepository.find(command.getDestination())
         ).flatMap((accounts) -> {
@@ -42,6 +42,29 @@ class DefaultTransferFundsHandler implements TransferFundsHandler {
                     .mapT1(source -> accountRepository.save(source.debit(command.getAmount()).get()))
                     .mapT2(dest -> accountRepository.save(dest.credit(command.getAmount()).get()));
             return saved.getT1().zipWith(saved.getT2());
-        }).block();
+        }).block();*/
+        /**
+         var amount = command.getAmount();
+
+         var debit = accountRepository.find(command.getSource())
+         .map(acc -> acc.debit(amount));
+
+
+         var credit = accountRepository.find(command.getDestination())
+         .map(acc -> acc.credit(amount));
+
+
+         debit.mergeWith(credit)
+         .map(Try::get)
+         .flatMap(accountRepository::save)
+         .blockLast();
+         */
+        Mono.zip(
+                accountRepository.find(command.getSource()),
+                accountRepository.find(command.getDestination())
+        ).flatMapMany((accounts) -> Flux.just(
+                accounts.getT1().debit(command.getAmount()).get(),
+                accounts.getT2().credit(command.getAmount()).get()
+        )).flatMap(accountRepository::save).blockLast();
     }
 }
