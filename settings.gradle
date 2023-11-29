@@ -4,4 +4,5 @@ include 'fun-list'
 include 'fun-basics'
 include 'reactive'
 include 'concurrency'
+include 'spring-on-virtual-threads'
 
